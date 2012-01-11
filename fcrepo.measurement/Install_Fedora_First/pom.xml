@@ -1,0 +1,127 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.fcrepo.performance</groupId>
+	<artifactId>Install_Fedora_First</artifactId>
+	<packaging>pom</packaging>
+	<name>Fedora Performance Measurement - Install Fedora First</name>
+	<description>Test Core Performance</description>
+	
+ 	
+	 <build>
+      <plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+				
+				    <!--  kopieren der fedora installer config -->
+					<execution>
+						<id>copy-filtered-test-config</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${target.home}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.parent.basedir}/src/test/filtered-resources</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+            <!-- installation von fedora -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				
+				<!-- kopieren des installer jars -->
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.fcrepo</groupId>
+									<artifactId>fcrepo-installer</artifactId>
+									<version>${fedora.version}</version>
+									<!-- classifier>standard</classifier -->
+									<overWrite>false</overWrite>
+									<outputDirectory>${target.home}</outputDirectory>
+									<destFileName>fedora-installer.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<configuration>
+					<skip>${skip.install.first}</skip>
+				</configuration>
+				
+				<!-- fedora installation -->
+				<executions>
+					<execution>
+						<id>install-fedora</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>java</executable>
+							<arguments>
+								<!-- argument>-Dskip.validation=true</argument -->
+								<argument>-jar</argument>
+								<argument>${target.home}/fedora-installer.jar</argument>
+								<argument>${target.home}/${fedora.installer.config}</argument>
+							</arguments>
+							<outputFile>${target.home}/fedora-installer.log
+							</outputFile>
+						</configuration>
+					</execution>
+					
+					<!-- Entfernen eines Fedora policies file -->
+					<execution>
+						<id>remove deny-unallowed-file-resolution</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>rm</executable>
+							<arguments>
+								<argument>${target.home}/fedora/server/fedora-internal-use/fedora-internal-use-repository-policies-approximating-2.0/deny-unallowed-file-resolution.xml</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		
+		</plugins>
+    
+	</build>
+
+		
+	<parent>
+		<groupId>org.fcrepo.performance</groupId>
+		<artifactId>fcrepo.measurement</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+</project>

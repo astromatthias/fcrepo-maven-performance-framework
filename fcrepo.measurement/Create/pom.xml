@@ -1,0 +1,220 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.fcrepo.performance</groupId>
+	<artifactId>Create</artifactId>
+	<packaging>pom</packaging>
+	<name>Fedora Performance Measurement - Create </name>
+	<description>Test Core Performance</description>
+	
+ 	
+	 <build>
+      <plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+				
+				    <!--  kopieren der fedora installer config -->
+					<execution>
+						<id>copy-filtered-test-config</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${target.home}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.parent.basedir}/src/test/filtered-resources</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+
+					<!-- kopieren des jmeter.properties (global) und testplan.properties (lokal) -->
+					<execution>
+						<id>copy-filtered-jmeter-test-config</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/test/jmeter-filtered-resources</directory>
+									<filtering>true</filtering>
+								</resource>
+								<resource>
+									<directory>${project.parent.basedir}/src/test/jmeter-filtered-resources</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+            <!-- installation von fedora -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				
+				<!-- kopieren des installer jars -->
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.fcrepo</groupId>
+									<artifactId>fcrepo-installer</artifactId>
+									<version>${fedora.version}</version>
+									<!-- classifier>standard</classifier -->
+									<overWrite>false</overWrite>
+									<outputDirectory>${target.home}</outputDirectory>
+									<destFileName>fedora-installer.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<configuration>
+					<skip>${skipITs}</skip>
+				</configuration>
+				
+				<!-- fedora installation -->
+				<executions>
+					<execution>
+						<id>install-fedora</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>java</executable>
+							<arguments>
+								<!-- argument>-Dskip.validation=true</argument -->
+								<argument>-jar</argument>
+								<argument>${target.home}/fedora-installer.jar</argument>
+								<argument>${target.home}/${fedora.installer.config}</argument>
+							</arguments>
+							<outputFile>${target.home}/fedora-installer.log
+							</outputFile>
+						</configuration>
+					</execution>
+					
+					<!-- Entfernen eines Fedora policies file -->
+					<execution>
+						<id>remove deny-unallowed-file-resolution</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>rm</executable>
+							<arguments>
+								<argument>${target.home}/fedora/server/fedora-internal-use/fedora-internal-use-repository-policies-approximating-2.0/deny-unallowed-file-resolution.xml</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- starten und stoppen von Tomcat-->
+			<plugin>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>cargo-maven2-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>start-container</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+						<configuration>
+							<wait>false</wait>
+						</configuration>
+					</execution>
+					<execution>
+						<id>stop-container</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<skip>${skipServer}</skip>
+					<wait>${cargo.wait}</wait>
+					<container>
+						<containerId>tomcat5x</containerId>
+						<home>${target.home}/fedora/tomcat</home>
+						<timeout>600000</timeout>
+						<systemProperties>
+							<FEDORA_HOME>${target.home}/fedora</FEDORA_HOME>
+							<CATALINA_HOME>${target.home}/fedora/tomcat</CATALINA_HOME>
+						</systemProperties>
+					</container>
+					<configuration>
+						<type>existing</type>
+						<home>${target.home}/fedora/tomcat</home>
+					</configuration>
+				</configuration>
+			</plugin>
+		
+     
+     
+     
+     
+			<!-- ausführen der JMETER Tests -->
+			<plugin>
+				<groupId>org.escidoc.jmeter</groupId>
+				<artifactId>maven-jmeter-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>jmeter-tests</id>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>jmeter</goal>
+						</goals>
+						<configuration>
+							<reportDir>${project.build.directory}/jmeter-reports</reportDir>
+							<workDir>${project.build.directory}/jmeter</workDir>
+							<userDir>${basedir}</userDir>
+							<jmeterLogLevel>DEBUG</jmeterLogLevel>
+							<jmeterDefaultPropertiesFile>
+								${project.parent.basedir}/src/test/jmeter/jmeter.properties
+							</jmeterDefaultPropertiesFile>
+							<jmeterCustomPropertiesFile>
+								${project.build.directory}/testplan.properties
+							</jmeterCustomPropertiesFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+    
+	</build>
+
+		
+	<parent>
+		<groupId>org.fcrepo.performance</groupId>
+		<artifactId>fcrepo.measurement</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+</project>

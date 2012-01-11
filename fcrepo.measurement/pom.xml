@@ -1,0 +1,298 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+  http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>org.fcrepo.performance</groupId>
+  <artifactId>fcrepo.measurement</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Fedora Performance Framework</name>
+  <description>Jmeter test for Fedora Performance Measurment</description>
+  <packaging>pom</packaging>
+  
+  
+  <issueManagement>
+		<system>Jira</system>
+		<url>https://www.escidoc.org/jira/browse/INFR</url>
+	</issueManagement>
+	<ciManagement>
+		<system>Hudson</system>
+		<url>http://escidev2.fiz-karlsruhe.de:8484/job/eSciDoc%20Measurement/</url>
+	</ciManagement>
+
+	<organization>
+		<name>FIZ Karlsruhe</name>
+		<url>http://www.fiz-karlsruhe.de</url>
+	</organization>
+	
+	<modules>
+	  <module>Install_Fedora_First</module>
+	  
+	  <module>Create</module>
+	  <module>Get</module>
+	  <module>Delete</module>
+	  <!-- module>Update</module -->
+  </modules>  
+  
+  <properties>
+
+	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	    
+		<java.source.version>1.6</java.source.version>
+		<java.target.version>1.6</java.target.version>
+		
+		<escidoc.server.host>localhost</escidoc.server.host>
+		<escidoc.server.port>8080</escidoc.server.port>
+		<!--  die version wird in den Profilen gesetzt -->
+		<fedora.version>3.5</fedora.version>
+		<fedora.installer.config>install.properties</fedora.installer.config>
+
+		<!-- for test installation -->
+		<escidoc.database.host>localhost</escidoc.database.host>
+		<escidoc.database.port>5432</escidoc.database.port>
+		<escidoc.database.user>escidoc</escidoc.database.user>
+		<escidoc.database.password>escidoc</escidoc.database.password>
+
+		<!-- Administrator Login Detail for Fedora -->
+
+		<fedora.database.user>fedoraAdmin</fedora.database.user>
+		<fedora.database.password>fedoraAdmin</fedora.database.password>
+
+	</properties> 
+	
+	<dependencies>
+		<dependency>
+		    <groupId>org.apache.jmeter</groupId>
+		    <artifactId>ApacheJMeter_core</artifactId>
+		    <version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jmeter</groupId>
+		    <artifactId>ApacheJMeter_components</artifactId>
+		    <version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jmeter</groupId>
+		    <artifactId>ApacheJMeter_functions</artifactId>
+		    <version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jmeter</groupId>
+		    <artifactId>ApacheJMeter_http</artifactId>
+		    <version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jmeter</groupId>
+		    <artifactId>ApacheJMeter_java</artifactId>
+		    <version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jmeter</groupId>
+		    <artifactId>ApacheJMeter_reports</artifactId>
+		    <version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jmeter</groupId>
+		    <artifactId>ApacheJMeter_tcp</artifactId>
+		    <version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jmeter</groupId>
+		    <artifactId>ApacheJMeter_ftp</artifactId>
+		    <version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jmeter</groupId>
+		    <artifactId>ApacheJMeter_jdbc</artifactId>
+		    <version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jmeter</groupId>
+		    <artifactId>ApacheJMeter_jms</artifactId>
+		    <version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jmeter</groupId>
+		    <artifactId>ApacheJMeter_ldap</artifactId>
+		    <version>2.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jmeter</groupId>
+		    <artifactId>ApacheJMeter_mail</artifactId>
+		    <version>2.4</version>
+		</dependency>
+	 	
+    </dependencies> 
+  
+  
+  
+  
+  <profiles>
+  
+	    
+	    <profile>
+	      <id>skip_fedora_install</id>
+	      <activation>
+			<property>
+			  <name>env</name>
+			  <value>skip13</value>
+			</property>
+	      </activation>
+	      <properties>
+			<skipITs>true</skipITs>
+			<skip.install.first>true</skip.install.first>
+			<skipServer>false</skipServer>
+			<fedora.version>3.5</fedora.version>
+	      </properties>
+	    </profile>
+	    
+	    
+	   <profile>
+	      <id>run_fedora_install</id>
+	      <activation>
+			<property>
+			  <name>env</name>
+			  <value>install13</value>
+			</property>
+			<activeByDefault>true</activeByDefault>
+	      </activation>
+	      <properties>
+	      	<skip.install.first>true</skip.install.first>
+			<skipITs>false</skipITs>
+			<skipServer>false</skipServer>
+			<fedora.version>3.5</fedora.version>
+	      </properties>
+	   </profile>	
+	   
+	   <profile>
+	      <id>fedora_local</id>
+	      <activation>
+	      	<property>
+			  <name>env</name>
+			  <value>installlocal</value>
+			</property>
+			<activeByDefault>true</activeByDefault>
+	      </activation>
+	      <properties>
+			<target.home>${project.build.directory}/fcrepo</target.home>
+	      </properties>
+	   </profile>	
+	   
+	   <profile>
+	      <id>fedora_global</id>
+	      <activation>
+			<property>
+			  <name>env</name>
+			  <value>installglobal</value>
+			</property>
+	      </activation>
+	      <properties>
+	      	<!-- von aussen setzen via -Dinstall.home=target/escidoc" -->
+			<target.home>${project.parent.basedir}/${install.home}</target.home>
+	      </properties>
+	   </profile>	
+	    
+    </profiles>
+      
+    <build>
+		<pluginManagement>
+			<plugins>
+
+				<!-- exec-maven-plugin [default config] -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>1.2</version>
+				</plugin>
+
+				<!-- maven-compiler-plugin [default config] -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.3.2</version>
+					<configuration>
+						<source>${java.source.version}</source>
+						<target>${java.target.version}</target>
+						<showDeprecation>true</showDeprecation>
+						<showWarnings>true</showWarnings>
+						<verbose>true</verbose>
+						<fork>false</fork>
+						<meminitial>128m</meminitial>
+						<maxmem>512m</maxmem>
+						<debug>false</debug>
+						<optimize>true</optimize>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.escidoc.jmeter</groupId>
+					<artifactId>maven-jmeter-plugin</artifactId>
+					<version>1.2.2</version>
+				</plugin>
+				
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>2.3</version>
+				</plugin>
+
+				<!-- cargo-maven2-plugin [default config] -->
+				<plugin>
+					<groupId>org.codehaus.cargo</groupId>
+					<artifactId>cargo-maven2-plugin</artifactId>
+					<version>1.1.2</version>
+				</plugin>
+
+				<!-- maven-resources-plugin [default config] -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>2.5</version>
+				</plugin>
+
+			</plugins>
+
+		</pluginManagement>
+  	
+	</build>	
+  
+	
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>org.fcrepo.fcrepo-installer</id>
+			<url>https://www.escidoc.org/artifactory/repo</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<repositories>
+		<repository>
+			<id>org.fcrepo.fcrepo-installer</id>
+			<url>https://www.escidoc.org/artifactory/repo</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+
+        <!-- needed for the JMETER maven plugin -->
+		<repository>
+		    <id>Java maven repo</id>
+		    <url>http://download.java.net/maven/2</url>
+		</repository>
+		<repository>
+		    <id>Maven JMeter Repo</id>
+		    <url>http://yciabaud.github.com/jmeter-maven-plugin/repository</url>
+		</repository>
+		<repository>
+        	<id>JBoss Thirdparty Releases</id>
+        	<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
+        </repository>
+     
+	</repositories>
+  
+</project>

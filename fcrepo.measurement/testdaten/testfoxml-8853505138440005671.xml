@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<digitalObject xmlns="info:fedora/fedora-system:def/foxml#"
+	VERSION="1.1" PID="random:7bb63dbf-c0ac-48d2-8edc-3e7ed7b5cb9d">
+	<objectProperties>
+		<property NAME="info:fedora/fedora-system:def/model#state"
+			VALUE="Active"></property>
+		<property NAME="info:fedora/fedora-system:def/model#label"
+			VALUE="random test object 2d956420-79da-4be4-b3ac-945dd638ab11"></property>
+		<property NAME="info:fedora/fedora-system:def/model#ownerId"
+			VALUE="testOwner"></property>
+		<property NAME="info:fedora/fedora-system:def/model#createdDate"
+			VALUE="2012-01-11T12:25:50.998Z"></property>
+		<property NAME="info:fedora/fedora-system:def/view#lastModifiedDate"
+			VALUE="2012-01-11T12:25:50.998Z"></property>
+	</objectProperties>
+	<datastream ID="random-datastream-91fdf67f-fb9d-4596-8776-2dccb78c1ae5"
+		CONTROL_GROUP="M">
+		<datastreamVersion ID="ds-f797cd8d-a19e-4974-9e92-a99965da6e8c"
+			LABEL="testobject-e8890794-ffdf-4f66-b443-aa64b1218631" CREATED="2012-01-11T12:25:50.997Z"
+			MIMETYPE="application/octet-stream" FORMAT_URI="info:fedora/fedora-system:def/foxml#">
+			<contentLocation TYPE="URL"
+				REF="file:/tmp/foxml-test-files/ebfaad11-3175-434f-8eb6-cd941c0dfb82"></contentLocation>
+		</datastreamVersion>
+	</datastream>
+</digitalObject>
