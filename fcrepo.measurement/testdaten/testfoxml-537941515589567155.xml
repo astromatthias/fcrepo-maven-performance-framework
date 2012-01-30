@@ -13,7 +13,7 @@
 		<property NAME="info:fedora/fedora-system:def/view#lastModifiedDate"
 			VALUE="2012-01-11T12:18:13.566Z"></property>
 	</objectProperties>
-	<datastream ID="random datastream 92967d8a-62d0-4e4e-9080-bdabb4c7964b"
+	<datastream ID="random-datastream-92967d8a-62d0-4e4e-9080-bdabb4c7964b"
 		CONTROL_GROUP="M">
 		<datastreamVersion ID="ds-57665329-147e-40b9-b569-40518b116247"
 			LABEL="testobject-58c692ed-941a-4529-9821-b293e5e76e8f" CREATED="2012-01-11T12:18:13.565Z"
