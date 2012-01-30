@@ -17,7 +17,7 @@
 	</issueManagement>
 	<ciManagement>
 		<system>Hudson</system>
-		<url>http://escidev2.fiz-karlsruhe.de:8484/job/eSciDoc%20Measurement/</url>
+		<url>http://escidev2.fiz-karlsruhe.de:8484/job/Fedora%20Measurement/</url>
 	</ciManagement>
 
 	<organization>
@@ -227,7 +227,7 @@
 				<plugin>
 					<groupId>org.escidoc.jmeter</groupId>
 					<artifactId>maven-jmeter-plugin</artifactId>
-					<version>1.2.2</version>
+					<version>1.2.3</version>
 				</plugin>
 				
 
